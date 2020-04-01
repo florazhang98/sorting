@@ -47,12 +47,37 @@ def _merged(xs, ys, cmp=cmp_standard):
     Runs in linear time.
     '''
 
+    i = 0
+    j = 0
+    merge = []
+
+    while i < len(xs) and j < len(ys):
+        if cmp(xs[i],ys[j]) == -1:
+            merge.append(xs[i])
+            i += 1
+        elif cmp(xs[i],ys[j]) == 1:
+            merge.append(ys[j])
+            j += 1
+        elif cmp(xs[i],ys[j]) == 0:
+            merge.append(xs[i])
+            merge.append(ys[j])
+            i += 1
+            j += 1
+
+    while i < len(xs):
+        merge.append(xs[i])
+        i += 1
+
+    while j < len(ys):
+        merge.append(ys[j])
+        j += 1
+
+    return merge
 
 def merge_sorted(xs, cmp=cmp_standard):
     '''
     Merge sort is the standard O(n log n) sorting algorithm.
     Recall that the merge sort pseudo code is:
-
         if xs has 1 element
             it is sorted, so return xs
         else
@@ -60,21 +85,27 @@ def merge_sorted(xs, cmp=cmp_standard):
             sort the left
             sort the right
             merge the two sorted halves
-
     You should return a sorted version of the input list xs
     '''
 
+    if len(xs) <= 1:
+        return xs
+    else:
+        mid = len(xs)//2
+        left = xs[:mid]
+        right = xs[mid:]
+        l = merge_sorted(left,cmp)
+        r = merge_sorted(right,cmp)
+        return _merged(l,r,cmp)
 
 def quick_sorted(xs, cmp=cmp_standard):
     '''
     Quicksort is like mergesort,
     but it uses a different strategy to split the list.
     Instead of splitting the list down the middle,
-    a "pivot" value is randomly selected, 
+    a "pivot" value is randomly selected,
     and the list is split into a "less than" sublist and a "greater than" sublist.
-
     The pseudocode is:
-
         if xs has 1 element
             it is sorted, so return xs
         else
@@ -83,20 +114,27 @@ def quick_sorted(xs, cmp=cmp_standard):
             put all the values greater than p in a list
             sort both lists recursively
             return the concatenation of (less than, p, and greater than)
-
     You should return a sorted version of the input list xs
     '''
 
+    less = []
+    more = []
+    equal = []
 
-def quick_sort(xs, cmp=cmp_standard):
-    '''
-    EXTRA CREDIT:
-    The main advantage of quick_sort is that it can be implemented in-place,
-    i.e. with O(1) memory requirement.
-    Merge sort, on the other hand, has an O(n) memory requirement.
 
-    Follow the pseudocode of the Lomuto partition scheme given on wikipedia
-    (https://en.wikipedia.org/wiki/Quicksort#Algorithm)
-    to implement quick_sort as an in-place algorithm.
-    You should directly modify the input xs variable instead of returning a copy of the list.
-    '''
+    if len(xs) <= 1:
+        return xs
+    else:
+       p = xs[0]
+       for i in range(len(xs)):
+           if cmp(p,xs[i]) == 1:
+               less.append(xs[i])
+           elif cmp(p,xs[i]) == -1:
+               more.append(xs[i])
+           elif cmp(p,xs[i]) == 0:
+               equal.append(xs[i])
+
+       m = quick_sorted(more,cmp)
+       l = quick_sorted(less,cmp)
+       concatenation = l + equal + m
+       return concatenation
